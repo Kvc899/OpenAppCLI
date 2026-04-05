@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build Release & Publish
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app
+
+      - name: Build Release Binary
+        run: swift build -c release
+
+      - name: Prepare Artifact
+        run: |
+          mkdir -p release
+          cp .build/release/OpenAppCLI release/openapp
+          cd release && tar czf openapp-macos.tar.gz openapp
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/openapp-macos.tar.gz
+          generate_release_notes: true
