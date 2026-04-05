@@ -52,22 +52,25 @@ if command -v "$BINARY_NAME" &> /dev/null; then
     CURRENT_VERSION=$("$BINARY_NAME" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
     LATEST_VERSION=$(get_latest_version | sed 's/^v//')
 
-    if [ -z "$LATEST_VERSION" ]; then
-        LATEST_VERSION="unknown"
-    fi
-
     echo -e "  ${DIM}Installed: v${CURRENT_VERSION}${RESET}"
-    echo -e "  ${DIM}Latest:    v${LATEST_VERSION}${RESET}"
-    echo ""
 
-    if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
-        success "OpenAppCLI is already up to date (v${CURRENT_VERSION})."
+    if [ -n "$LATEST_VERSION" ]; then
+        echo -e "  ${DIM}Latest:    v${LATEST_VERSION}${RESET}"
         echo ""
-        exit 0
+
+        if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
+            success "OpenAppCLI is already up to date (v${CURRENT_VERSION})."
+            echo ""
+            exit 0
+        fi
+
+        echo -e "${YELLOW}${BOLD}  A new version is available: v${LATEST_VERSION}${RESET}"
+    else
+        echo -e "  ${DIM}Latest:    (no release found)${RESET}"
+        echo ""
+        warn "Could not determine latest version. Reinstalling..."
     fi
 
-    # Versions differ — ask to update
-    echo -e "${YELLOW}${BOLD}  A new version is available: v${LATEST_VERSION}${RESET}"
     echo ""
     printf "  Update now? [y/N] "
     read -r REPLY
