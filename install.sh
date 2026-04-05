@@ -49,7 +49,7 @@ get_latest_version() {
 
 # Check if already installed
 if command -v "$BINARY_NAME" &> /dev/null; then
-    CURRENT_VERSION=$("$BINARY_NAME" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+    CURRENT_VERSION=$("$BINARY_NAME" --version 2>/dev/null | sed 's/\x1B\[[0-9;]*m//g' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
     LATEST_VERSION=$(get_latest_version | sed 's/^v//')
 
     echo -e "  ${DIM}Installed: v${CURRENT_VERSION}${RESET}"
