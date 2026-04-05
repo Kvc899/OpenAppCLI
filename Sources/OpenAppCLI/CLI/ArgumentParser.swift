@@ -24,6 +24,12 @@ enum Command {
 
     /// Display version: `openapp --version`
     case version
+
+    /// Update OpenAppCLI to the latest version: `openapp update`
+    case update
+
+    /// Uninstall OpenAppCLI: `openapp uninstall`
+    case uninstall
 }
 
 /// Parses raw command-line arguments into a `Command`.
@@ -58,6 +64,12 @@ enum ArgumentParser {
         case "--version", "-v":
             return .version
 
+        case "update", "upgrade":
+            return .update
+
+        case "uninstall", "remove":
+            return .uninstall
+
         default:
             // Everything else is treated as a launch query
             let query = arguments.joined(separator: " ").trimmed
@@ -83,6 +95,8 @@ enum ArgumentParser {
           \("openapp".colored(.green)) search <query>      Search for applications by name
           \("openapp".colored(.green)) help                Show this help message
           \("openapp".colored(.green)) --version           Show version
+          \("openapp".colored(.green)) update              Update to latest version
+          \("openapp".colored(.green)) uninstall           Uninstall OpenAppCLI
 
         \(examples)
           \("openapp safari".colored(.cyan))              Launch Safari
@@ -91,7 +105,7 @@ enum ArgumentParser {
           \("openapp list".colored(.cyan))                List every installed app
 
         \(aliases)
-          list → ls      search → find
+          list → ls      search → find      update → upgrade      uninstall → remove
         """
     }
 }

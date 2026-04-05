@@ -30,20 +30,57 @@ echo -e "${CYAN}${BOLD}  ╚═════════════════�
 echo ""
 
 # Check macOS
-if [ "$(uname -s)" != "Darwin" ]; then
-    error "OpenAppCLI only supports macOS."
-fi
+[ "$(uname -s)" != "Darwin" ] && error "OpenAppCLI only supports macOS."
 
 # Check architecture
 ARCH="$(uname -m)"
-if [ "$ARCH" != "arm64" ] && [ "$ARCH" != "x86_64" ]; then
-    error "Unsupported architecture: $ARCH"
-fi
+[ "$ARCH" != "arm64" ] && [ "$ARCH" != "x86_64" ] && error "Unsupported architecture: $ARCH"
 
 info "Detecting system..."
 echo -e "  ${DIM}OS:   macOS $(sw_vers -productVersion)${RESET}"
 echo -e "  ${DIM}Arch: $ARCH${RESET}"
 echo ""
+
+# Get latest version from GitHub
+get_latest_version() {
+    curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null \
+        | grep '"tag_name"' | head -1 | sed 's/.*"tag_name": *"//;s/".*//'
+}
+
+# Check if already installed
+if command -v "$BINARY_NAME" &> /dev/null; then
+    CURRENT_VERSION=$("$BINARY_NAME" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+    LATEST_VERSION=$(get_latest_version | sed 's/^v//')
+
+    if [ -z "$LATEST_VERSION" ]; then
+        LATEST_VERSION="unknown"
+    fi
+
+    echo -e "  ${DIM}Installed: v${CURRENT_VERSION}${RESET}"
+    echo -e "  ${DIM}Latest:    v${LATEST_VERSION}${RESET}"
+    echo ""
+
+    if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
+        success "OpenAppCLI is already up to date (v${CURRENT_VERSION})."
+        echo ""
+        exit 0
+    fi
+
+    # Versions differ — ask to update
+    echo -e "${YELLOW}${BOLD}  A new version is available: v${LATEST_VERSION}${RESET}"
+    echo ""
+    printf "  Update now? [y/N] "
+    read -r REPLY
+    echo ""
+    if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+        info "Update cancelled."
+        exit 0
+    fi
+
+    info "Updating OpenAppCLI..."
+else
+    info "Installing OpenAppCLI..."
+fi
 
 # Try downloading a pre-built release first
 LATEST_URL="https://github.com/${REPO}/releases/latest/download/openapp-macos.tar.gz"
@@ -57,23 +94,14 @@ if curl -fsSL "$LATEST_URL" -o "$TMP_DIR/openapp-macos.tar.gz" 2>/dev/null; then
     info "Extracting..."
     tar -xzf "$TMP_DIR/openapp-macos.tar.gz" -C "$TMP_DIR"
 else
-    # No release found — build from source
     warn "No pre-built release found. Building from source..."
     echo ""
-
-    # Check for Swift
-    if ! command -v swift &> /dev/null; then
-        error "Swift is required to build from source. Install Xcode or Xcode Command Line Tools."
-    fi
-
+    command -v swift &> /dev/null || error "Swift is required. Install Xcode or Xcode Command Line Tools."
     info "Cloning repository..."
-    git clone --depth 1 "https://github.com/${REPO}.git" "$TMP_DIR/repo" 2>/dev/null || \
-        error "Failed to clone repository."
-
+    git clone --depth 1 "https://github.com/${REPO}.git" "$TMP_DIR/repo" 2>/dev/null || error "Failed to clone repository."
     info "Building (this may take a minute)..."
     cd "$TMP_DIR/repo"
     swift build -c release 2>&1 | tail -1 || error "Build failed."
-
     cp ".build/release/OpenAppCLI" "$TMP_DIR/$BINARY_NAME"
     BUILT_FROM_SOURCE=true
 fi
@@ -96,11 +124,7 @@ if command -v "$BINARY_NAME" &> /dev/null; then
     echo ""
     echo -e "  ${DIM}Version:  $("$BINARY_NAME" --version 2>/dev/null || echo "unknown")${RESET}"
     echo -e "  ${DIM}Location: $(which $BINARY_NAME)${RESET}"
-    if [ "$BUILT_FROM_SOURCE" = true ]; then
-        echo -e "  ${DIM}Method:   Built from source${RESET}"
-    else
-        echo -e "  ${DIM}Method:   Pre-built binary${RESET}"
-    fi
+    [ "$BUILT_FROM_SOURCE" = true ] && echo -e "  ${DIM}Method:   Built from source${RESET}" || echo -e "  ${DIM}Method:   Pre-built binary${RESET}"
     echo ""
     echo -e "  Get started: ${CYAN}openapp help${RESET}"
     echo ""

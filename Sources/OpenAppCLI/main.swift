@@ -51,5 +51,46 @@ case .help:
 
 case .version:
     print("\("OpenAppCLI".bold(.cyan)) v\(ArgumentParser.version.colored(.green))")
+
+case .update:
+    print("\("▶".colored(.cyan)) Checking for updates...")
+    let installScript = "https://raw.githubusercontent.com/Kvc899/OpenAppCLI/main/install.sh"
+    let task = Process()
+    task.executableURL = URL(fileURLWithPath: "/bin/bash")
+    task.arguments = ["-c", "curl -fsSL \(installScript) | bash"]
+    task.standardInput = FileHandle.standardInput
+    try? task.run()
+    task.waitUntilExit()
+    exit(task.terminationStatus)
+
+case .uninstall:
+    print("\("▶".colored(.red)) Uninstalling OpenAppCLI...")
+    let binaryPath = "/usr/local/bin/openapp"
+
+    // Confirm
+    print("")
+    print("  This will remove \(binaryPath.colored(.yellow))")
+    print("")
+    print("  Continue? [y/N] ", terminator: "")
+    guard let reply = readLine()?.trimmed.lowercased(), reply == "y" else {
+        print("\n  Uninstall cancelled.".colored(.yellow))
+        exit(EXIT_SUCCESS)
+    }
+
+    let rm = Process()
+    rm.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
+    rm.arguments = ["rm", "-f", binaryPath]
+    try? rm.run()
+    rm.waitUntilExit()
+
+    if rm.terminationStatus == 0 {
+        print("")
+        print("  \("✓ OpenAppCLI uninstalled successfully.".bold(.green))")
+        print("")
+    } else {
+        var stderr = FileHandle.standardError
+        print("\("Error:".bold(.red)) Failed to remove \(binaryPath)", to: &stderr)
+        exit(EXIT_FAILURE)
+    }
 }
 
