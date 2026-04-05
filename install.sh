@@ -73,7 +73,7 @@ if command -v "$BINARY_NAME" &> /dev/null; then
 
     echo ""
     printf "  Update now? [y/N] "
-    read -r REPLY
+    read -r REPLY < /dev/tty
     echo ""
     if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
         info "Update cancelled."
