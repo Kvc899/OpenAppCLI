@@ -17,23 +17,9 @@ A macOS command-line tool to launch applications from the terminal with fuzzy ma
 
 ## Installation
 
-### Build from source
-
 ```bash
-git clone https://github.com/youruser/OpenAppCLI.git
-cd OpenAppCLI
-swift build -c release
+curl -fsSL https://openapp.kvchub.com/install.sh | bash
 ```
-
-The binary will be at `.build/release/OpenAppCLI`. Copy it somewhere in your `$PATH`:
-
-```bash
-cp .build/release/OpenAppCLI /usr/local/bin/openapp
-```
-
-### Using the Xcode project
-
-Open `OpenApp CLI.xcodeproj` in Xcode, build with **Cmd+B**, and archive for distribution.
 
 ## Usage
 
