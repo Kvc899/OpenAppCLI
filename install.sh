@@ -25,7 +25,7 @@ error()   { echo -e "${RED}${BOLD}Error:${RESET} $1" >&2; exit 1; }
 
 echo ""
 echo -e "${CYAN}${BOLD}  ╔═══════════════════════════════╗${RESET}"
-echo -e "${CYAN}${BOLD}  ║       OpenAppCLI Installer     ║${RESET}"
+echo -e "${CYAN}${BOLD}  ║     OpenAppCLI Installer V1   ║${RESET}"
 echo -e "${CYAN}${BOLD}  ╚═══════════════════════════════╝${RESET}"
 echo ""
 
@@ -86,7 +86,7 @@ else
 fi
 
 # Try downloading a pre-built release first
-LATEST_URL="https://github.com/${REPO}/releases/latest/download/openapp-macos.tar.gz"
+LATEST_URL="https://github.com/OpenAppCLI/releases/latest/download/openapp-macos.tar.gz"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
