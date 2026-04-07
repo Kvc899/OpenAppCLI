@@ -57,39 +57,6 @@ openapp search code
 | `list`   | `ls`  |
 | `search` | `find`|
 
-## Project Structure
-
-```
-OpenApp CLI/
-├── OpenApp CLI/
-│   ├── main.swift                  # Entry point
-│   ├── App/
-│   │   ├── AppFinder.swift         # Discovers installed .app bundles
-│   │   └── AppLauncher.swift       # Launches apps with fuzzy matching
-│   ├── CLI/
-│   │   └── ArgumentParser.swift    # Parses CLI commands
-│   ├── Extensions/
-│   │   └── String+Extensions.swift # String helpers
-│   └── Models/
-│       └── AppInfo.swift           # App data model
-├── Tests/
-│   └── OpenAppCLITests/
-│       ├── AppInfoTests.swift
-│       ├── ArgumentParserTests.swift
-│       └── StringExtensionTests.swift
-├── Package.swift
-├── README.md
-├── LICENSE
-└── CONTRIBUTING.md
-```
-
-## Running Tests
-
-```bash
-swift test
-```
-
-Or in Xcode: **Cmd+U**.
 
 ## License
 
