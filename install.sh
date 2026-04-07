@@ -43,7 +43,7 @@ echo ""
 
 # Get latest version from GitHub
 get_latest_version() {
-    curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null \
+    curl -fsSL "https://api.github.com/repos/OpenAppCLI/releases/latest" 2>/dev/null \
         | grep '"tag_name"' | head -1 | sed 's/.*"tag_name": *"//;s/".*//'
 }
 
